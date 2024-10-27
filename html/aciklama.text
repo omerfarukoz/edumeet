@@ -1,0 +1,138 @@
+şimdi hocam
+
+%% START - GENEL NOTLAR %%
+
+fonksiyonlar kendi içeriisnde senkron ya da asenkron çalışabilir formatta olmalı. bazı hizmetlerin asenkron çalışması gerektiğinden asenkron olarak çalıştırabilmemiz gerekmektedir.
+
+ciddiyet seviyiesi belirlenebilecek: Ben çok ciddi bir profeseröüre sunum yapmak istiyorum(her yanlışa dikkat ediyor.)
+                                     Ben yarı ciddi bir profesöre sunum yapmak istiyorum (yanlışlara dikkat edebiliyor fakat görmezden gelebiliyor)
+                                     Ben ciddi bir profeseröüre sunum yapmak istemiyorum ( yanlışları nerdeyse görmüyor)
+%% END - GENEL NOTLAR %%
+
+
+---------
+
+proje geneel olarak üç aşamadan oluşuyor.
+
+1 - paylaşılan görüntünün işlenmesi, yorumlanması, cevap üretilmesi,
+2 - kullanıcının mimikilerin işlenmesi, yorumlanması, cevaplandırılması,
+3 - kullanıcının sesinin işlenmesi, yorumlanması, cevaplandırılması.
+
+- anasayfa  anasayfa  anasayfa  anasayfa  anasayfa  anasayfa  anasayfa  anasayfa  anasayfa  anasayfa
+** img: https://ibb.co/b65N7Tj **
+
+(frontend kısmını anlatmıyorum)
+anasayfada çok bir şey yer almıyor. oturum başlatma butonu, uygulamayı açıklayan bir kaç metin vsvs.
+oturum başlatma modali içerisinde. sunum konu başlığı, sunum içeriği açıklaması, kamera açık - kapalı, yayın açık - kapalı, ses açık olmak zorunda, profesör ciddiyet seviyesi belirleme
+kullanıcı bu modal içerisinde yer alan parametrelerle sunumunun ayarlarını belirleyecek.
+fonksiyon çağıracak ve bu şekilde session başlatacak.
+
+- anasayfa  anasayfa  anasayfa  anasayfa  anasayfa  anasayfa  anasayfa  anasayfa  anasayfa  anasayfa -
+
+
+
+- sunum sayfası - sunum sayfası - sunum sayfası - sunum sayfası - sunum sayfası - sunum sayfası - sunum sayfası - sunum sayfası 
+
+( ai insan görüntüsü paylaşılmayacak )
+burda düz bir görüntülü konusma sayfası hayal etmeni istiyorum.
+
+** img: https://www.searchenginejournal.com/wp-content/uploads/2020/07/d36ce328-5d1b-472c-9b79-9f41d2b1e626-5f68b87adc35a-768x473.jpeg ** 
+
+kullanıcı görüntüsünü paylaşıyor ise kamera görüntüsü sağ alttaki küçük ekran içerisinde yer alcak.
+ekran paylaşıyor ise ana ekranda yer alacak. eğer ekran paylaşmıyorsa şu tarz bir ikon yer alacak.
+
+** img: https://ibb.co/Gd9Gz4G ** 
+
+kullanıcı kamera görüntüsü 10 saniyelik paketler halinde fonksiyona bverilecek. fonksiyon görüntüyü işleyip duygu analizi yapacak.  <-> (bknz. kamera işlenmesi)
+ses yayını için voice to text kullanılacak. bunun için voice stream kullanacağız. direkt gelen metni ai sokucaz <-> (bknz. ses stream işlenmesi)
+ai sesli yanıt - gelen veriler işlendikten sonra bir cevap dönecek. cevap stream ile yapılacak. <-> (bknz. ai response)
+kullanıcı yayın içerisinde yayın ayarlarıyla ilgili değişiklik yapabilecek (yayın kapatma, yayın başlatma, kamera başlatma - kapatma) <-> (bknz. yayın verisinin işlenmesi)
+
+
+- sunum sayfası - sunum sayfası - sunum sayfası - sunum sayfası - sunum sayfası - sunum sayfası - sunum sayfası - sunum sayfası 
+
+
+%% kamera işlenmesi %%
+
+kamera görüntüsü 10 saniyelik veriler halinde gelecek. yanlış hatırlamıyorsam .webp olacak fakat değişiklik sağlanabildiğini tahmin ediyorum.
+kamera verisi geldiğinde direkt işlenmeye alacak. 
+bu modül asenkron bir şekilde çalışmalıdır.
+asenkron çalışmasının nedeni. bir görüntü paketinin incelenme süresi minimum 10 saniye olacaktır. fonksiyon calıstıktan sonra diğer cevapların üretilmesi için çok büyük bir kayıp.
+ayrıca 10 saniye kayıt kısmı asenkron olduğundan sistemde ekstra yük oluşturacak ve düzgün çalıştırmayacaktır.
+
+örnek veriyorum::
+
+- zaman dalgası: -
+x: 10 saniyelik kaydın fonksiyona gönderilmesi (kullanıcı kamerası)
+&: 10 saniyelik kaydın normal return süresi
+X: 10 saniyelik fonksiyon cıktsınını oluşturulması ( 3 saniye sürsün)
+v: voice verisinin fonksyiona sokulması 
++: voice verisinin normal çıkması gereken süre
+V: voice verisinin fonksiyon cıktısının tarayıcı tarafından okunması (return) ( 2 saniye sürsün)
+e: ekran kayıt fonksiyonunun başlaması (10 saniyelik gelecek görüntü)
+#: ekran kayıt normal çıkması gereken zaman dalgası
+E: ekran kayıt fonksiyonunun return etmesi (5 saniye sürsün)
+
+zaman dalgası =
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 ...
+                  x     X&                      x     X&                      x     X&                       x    X&                       x    X&                      x     X&                       x
+                  e1              #1     E1        e2               #1    E2
+                  v1    +1v2    +2              V1          V2
+
+bu koda göre ilk önce insan yüz analizi, sonrasında ekran kaydı analizi, sonrasında ses analizi yapılıyor ve hepsi senkron şekilde yazılmış
+gördüğün gibi asenkron olmadığında çıkan veriler zaman dalgasında kayıyor. voice fonksiyonu üzerinde 12 saniye gibi bir kayıp oluşuyor
+bu özellikle ani tepki verilmesi gereken fonksiyonlar için kritik öneme sahip
+bu nedenlerle bütün ai fonksiyonları asenkron yazılmalı
+
+(( asenkron kısmın nasıl çalışacağın dair istişare etmemiz gerekiyor: websocket, socket, asyncio.. ne kullanacağız konusunda kararlaştırmalıyız.))
+
+yazılan asenkron kamera tespit fonksiyonu gelen görüntüyü google bucket / strage ' e yükleyecek. ardından google vision ile işleme tabii tutacak. 
+
+elde etmesi gereken veriler:
+- yüz mimik durumu (sinirli,kızgın,anlayışsız,mutlu,heycanlı,sempatik vs vs..)
+- kaç kişinin olduğu, kopya çekeceği birisi var mı ? varsa kimler konuşuyor. kısaca kaç insan yüzü var, hangisi iletişimi kuruyor.
+- giyim kuşamı nasıl? resmi mi giyinmiş, pasaklı mı sunumu hangi şekilde yapıyor.. ( iyi hal indirimi gibi düşün. )
+- el hareketleri, sunumunu yaparken el hareketleri kullanıyor mu ? ( kısaca genel vucüt dili )
+sanırım bu kadarı yeterli.
+
+
+
+%% ses stream işlenmesi %%
+
+fonksiyon asenkron olacak
+muhtemelen anlık stream şekilde veriler iletilecek. fonksiyon geeln streami kısa kısa dinleyecek. kelmilerei tespit edip metne çevirecek. metni de işleme tabii tutulacak.
+metin olacak return edilecek. bu metin verisi bir çok yerde kullanılacak. <=> (bknz. altyazı fonksiyonu)
+başka bir olay yok burda başka en azından aklıma gelen yok kısaca voice to text diyebiliriz.
+
+
+
+%% altyazı fonksiyonu %%
+
+kullanının konuştuğu metin ekranda yazacak. bir özelliği yok sadece hoş durması için olacak. chatgpt çıktı verirken tek tek parça parça çıktı vermesi gibi ekranda yazılacak. (stream dönecek yani)
+ayrıca bu fonksiyon sadece kullanıcının söyledikleri için değil yapay zekanın sesli vereceği çıktılar için de geçerli olacak. 
+kısaca alt yazı fonksiyonu. her türlü sesli mesajı, soruyu yazısal bir şekilde tarayıcıda gösterecek.
+
+
+
+%% yayın verisinin işlenmesi %%
+
+kullanıcıdan gelen yayın ( 10 saniyelik paketler halinde gelecek ) işlenecek. google bucket / storage yüklenecek. işlenecek ve çıktı verecek.
+çıktı içeriği şu olmalıdır:
+
+- görsel içeriği, yayın içerisinde ne var ? (içeriği tanımla (slayt, metin, anlatış konsepti nedir? vs. vs.))
+- içeriğin contenti, metinse metni oku, resimse resmi tanımla. matematiksel fonksyion varsa hesapla, yazım hatalarını tespit et vs. 
+(yapılması gerekenler bunlar bu fonksiyon içerisinde olmasına gerek yok)
+(bu fonksiyon sadece metnin içeriği ile ilgili yukardaki bilgileri dönmesi yeterli matematiksel fonksiyonların hesaplanması gibi veriler farklı bir fonksiyonda hesaplanabilir)
+
+%% ai response %% 
+
+bu fonksiyon yukarda bahsettiğim 3 ana fonksiyonun (ses,yayın,kamera) çıktılarına göre bir tartıya sokacak.
+
+görüntü içerisindeki mimikler anlayışlı mı , istekli mi isteksiz mi genel mimik kontrolu. bu mimiğe uygun yanıt üretip seslendir.
+seste yer alan içerik ile ekranda paylaşılan içerik birbirine uyuyor mu (konu olarak uyuyor mu?) (konudan koptu mu ?)
+seste yer alan içerik ile kullanıcı mimiklerin arasındaki bağlantı hesaplanacak (birbiriyl euyumlu mu ? sırıtan bir mimik var mı ?)
+yayın içerisinde herhangi bir problem var mı (matematiksel işlem hatası, yazım yanlışı)
+ses içerisinde bir problem var mı? yanlış telaffuz, yanlış cümle kullanımı (ben macbook yerim.) (anlamsız cümleler vs) (metin çıktısını direkt okutacağımızdan ai kendisi tespit edebilecektir.)
+eğer meeting başında yayın kapalıysa cevap ver : yayın kapalı mı devam edeceğiz ? 
+eğer meeting   ""     ses     "           "  ": ses kapalıyken devam edemeyiz. toplantıyı sonlandıralım mı ? (evet-> toplantıyı bitir, cevap yok->30 sn toplantıyı bitir)
+eğer meeting    "      görüntü "    "   " : görüntü kapalı mı deevam ediyoruz? 

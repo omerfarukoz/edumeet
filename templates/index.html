@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Kamera Canlı Video Kaydı</title>
+</head>
+<body>
+    <h1>Web Kamera Canlı Video Kaydı</h1>
+    <video id="video" width="640" height="480" autoplay></video>
+    <button id="start">Kaydı Başlat</button>
+    <button id="stop">Kaydı Durdur</button>
+    <form id="upload-form" action="/upload_video" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="video" id="video-blob">
+        <input type="submit" value="Videoyu Kaydet">
+    </form>
+    <script>
+        let mediaRecorder;
+        let recordedChunks = [];
+        let stream;
+    
+        // Kullanıcının kamerasını başlat
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(s => {
+                stream = s;
+                document.getElementById('video').srcObject = stream;
+    
+                mediaRecorder = new MediaRecorder(stream);
+    
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+    
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const formData = new FormData();
+                    formData.append('video', blob, 'video.webm');
+                    document.getElementById('video-blob').value = blob;
+    
+                    // Formu gönder
+                    fetch('/upload_video', {
+                        method: 'POST',
+                        body: formData
+                    }).then(response => response.text()).then(data => {
+                        alert(data);
+                    });
+    
+                    recordedChunks = []; // Clear recorded chunks after sending
+                };
+    
+                // Kaydı başlat
+                mediaRecorder.start();
+    
+                // Her 1 saniyede bir kaydı durdur ve gönder
+                setInterval(() => {
+                    if (mediaRecorder.state === 'recording') {
+                        mediaRecorder.stop(); // Stop the recording
+                        mediaRecorder.start(); // Restart the recording for the next chunk
+                    }
+                }, 1000); // 1000 milliseconds = 1 second
+            })
+            .catch(error => {
+                console.error('Error accessing media devices.', error);
+            });
+    </script>
+    
+</body>
+</html>
