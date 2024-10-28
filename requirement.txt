@@ -2,7 +2,7 @@ google-cloud-videointelligence
 google-cloud-storage
 google-cloud-vision
 google-cloud-speech
-google.generativeai
+google-generativeai
 google-cloud-texttospeech
 google-cloud-language
 moviepy
@@ -11,9 +11,8 @@ opencv-python
 pydantic
 SpeechRecognition
 pyttsx3
-pyaudio
 fastapi
 uvicorn
-mss
 redis
 itsdangerous
+pygame

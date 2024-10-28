@@ -1,14 +1,7 @@
 from google.cloud import videointelligence
 from google.cloud import vision
 import io
-
-
-class GoogleVisionService:
-
-    def __init__(self):
-        self.video_client = videointelligence.VideoIntelligenceServiceClient()
-        self.image_client = vision.ImageAnnotatorClient()
-
+import asyncio
 
 class GoogleVisionService:
 
@@ -17,64 +10,95 @@ class GoogleVisionService:
         self.image_client = vision.ImageAnnotatorClient()
 
 
-    def analyze_camera(self, video_path):
-        """Analyzes a video at the given local path for people and emotions.
+    async def analyze_video(self, video_path):
 
-        Args:
-            video_path: The local path to the video file (e.g., "/path/to/your/video.mp4").
+        features = [
+            videointelligence.Feature.SHOT_CHANGE_DETECTION,
+            videointelligence.Feature.LABEL_DETECTION,
+            videointelligence.Feature.TEXT_DETECTION,
+            videointelligence.Feature.SPEECH_TRANSCRIPTION
+        ]
 
-        Returns:
-            A dictionary containing the number of faces detected, the likelihood name for adult content,
-            and a list of emotion likelihoods for each detected face.
+        config = videointelligence.SpeechTranscriptionConfig(
+        language_code="en-US" )
+ 
 
-        Raises:
-            Exception: If an error occurs during video analysis.
-        """
 
-        features = [videointelligence.Feature.PERSON_DETECTION, videointelligence.Feature.EMOTION_ANALYSIS]
-
-        # Read the video file into memory
         with open(video_path, "rb") as f:
             video_content = f.read()
 
-        # Create an input video object
-        input_video = videointelligence.InputVideo(input_content=video_content)
-
-        # Create a request object
         request = videointelligence.AnnotateVideoRequest(
-            input_uri=input_video, features=features
+            features=features, input_content=video_content,
+            video_context=videointelligence.VideoContext(speech_transcription_config=config)
         )
 
-        # Send the request to the Video Intelligence API
         operation = self.video_client.annotate_video(request=request)
 
         try:
-            result = operation.result(timeout=60)  # Set a timeout for video processing
+            result = operation.result(timeout=120)
+            annotation_results = result.annotation_results[0]
+
+            with open("my_file.txt", "w") as file:
+                file.write(str(result))
+
+            label_descriptions = []
+            for annotation in annotation_results.shot_label_annotations:
+                if annotation.entity.description:
+                    label_descriptions.append(annotation.entity.description)
+
+            text_annotations = []
+            for text_annotation in annotation_results.text_annotations:
+                if text_annotation.text:
+                    text_annotations.append(text_annotation.text)
+
+            
+            speech_transcriptions = []
+            for speech_transcription in annotation_results.speech_transcriptions:
+                if speech_transcription.alternatives:
+                    speech_transcriptions.append(speech_transcription.alternatives[0].transcript)
+
         except TimeoutError:
-            raise Exception("Video analysis timed out. Consider longer videos or optimizing requests.")
+            raise Exception("Timeout Error")
+        
 
-        # Extract relevant information from the response
-        face_count = len(result.annotation_results[0].person_detection_annotations)
-        safe_search = result.annotation_results[0].safe_search_detection
-        likelihood_name = vision.Likelihood(safe_search.adult).name
 
-        # Extract emotion information
-        emotion_likelihoods = []
-        for annotation in result.annotation_results[0].emotion_recognition_annotations:
-            emotion_likelihoods.append({
-                "joy": annotation.joy_likelihood,
-                "anger": annotation.anger_likelihood,
-                "surprise": annotation.surprise_likelihood,
-                "sorrow": annotation.sorrow_likelihood,
-                "uncertainty": annotation.uncertainty_likelihood
-            })
+    async def detect_face_emotions(self,image_path):
+        """Detects faces in an image and extracts emotions.
 
-        return {
-            'face_count': face_count,
-            'likelihood_name': likelihood_name,
-            'emotion_likelihoods': emotion_likelihoods
-        }
-    
+        Args:
+            path: The path to the image file.
+
+        Returns:
+            A list of detected faces with their emotions in a dictionary format.
+        """
+
+        
+
+        with io.open(image_path, 'rb') as image_file:
+            content = image_file.read()
+
+        image = vision.Image(content=content)
+
+        response = self.image_client.face_detection(image=image)
+        faces = response.face_annotations
+
+        face_emotions = []
+        for face in faces:
+            emotions = {
+                "joy": face.joy_likelihood,
+                "sorrow": face.sorrow_likelihood,
+                "anger": face.anger_likelihood,
+                "surprise": face.surprise_likelihood,
+                "under_exposed": face.under_exposed_likelihood,
+                "blurred": face.blurred_likelihood,
+                "headwear": face.headwear_likelihood,
+            }
+            face_emotions.append(emotions)
+
+        return face_emotions
+
+        
+
 
 
     async def detect_text(self, image_path):
@@ -114,19 +138,9 @@ class GoogleVisionService:
 
         image = vision.Image(content=content)
 
-        response = self.image_client.document_text_detection(image=image)   
+        response = self.image_client.document_text_detection(image=image)       
+        print(response)
 
-        all_text = ""
-        for page in response.pages:
-            for block in page.blocks:
-                for paragraph in block.paragraphs:
-                    for word in paragraph.words:
-                        word_text = ''.join([
-                            symbol.text for symbol in word.symbols   
-                        ])
-                        all_text += word_text + " "
-
-        return all_text
 
 
     async def detect_labels(self, image_path):
@@ -158,3 +172,15 @@ class GoogleVisionService:
             print(f'\n"{label.description}"')
 
         return labels   
+    
+if __name__ == "__main__":
+    api = GoogleVisionService()
+
+  # asyncio.run(api.detect_document_all_text("/Users/celalcanaslan/Desktop/Screenshot 2024-10-27 at 15.19.59.png"))
+  # asyncio.run(api.detect_labels("/Users/celalcanaslan/Desktop/Screenshot 2024-10-27 at 15.19.59.png"))
+  # asyncio.run(api.detect_text("/Users/celalcanaslan/Desktop/Screenshot 2024-10-27 at 15.19.59.png"))
+    asyncio.run(api.analyze_video("/Users/celalcanaslan/Downloads/last-video.mp4")) # b
+  # emotions = asyncio.run(api.detect_face_emotions(image_path))
+
+
+

@@ -1,31 +1,31 @@
 from google.cloud import language
-from google.cloud.language import enums
-from google.cloud.language import types
+from google.cloud import language
 
-def analyze_document(text):
-    """Analyzes a document and extracts key information."""
+class GoogleNaturalLanguageService:
+
     client = language.LanguageServiceClient()
-
-    document = types.Document(
-        content=text,
-        type=enums.Document.Type.PLAIN_TEXT)
     
+    def analyze_document(self,text):
+    
+        document = language.Document(
+            content=text,
+            type=language.Document.Type.PLAIN_TEXT)
+        
 
-    sentiment = client.analyze_sentiment(document=document).document_sentiment
+        sentiment = self.client.analyze_sentiment(document=document).document_sentiment
 
-    entities = client.analyze_entities(document=document).entities
+        entities = self.client.analyze_entities(document=document).entities
 
-    categories = client.classify_text(document=document).categories
+        categories = self.client.classify_text(document=document).categories
 
-    return {
-        "sentiment": sentiment,
-        "entities": entities,
-        "categories": categories
-    }
+        return {
+            "sentiment": sentiment,
+            "entities": entities,
+            "categories": categories
+        }
 
-# Makale metnini buraya ekleyin
-text = """
-# Makale metni buraya gelecek
-"""
 
-analyze_document(text)
+if __name__ == "__main__":
+    text = "This is a sample text for sentiment analysis. and more and more words for testing the entity analysis."
+    result = GoogleNaturalLanguageService().analyze_document(text)
+    print(result)

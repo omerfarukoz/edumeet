@@ -25,3 +25,8 @@ class GoogleTextToSpeechService:
 
         with open(f'{output_file}.mp3', 'wb') as out:
             out.write(response.audio_content)
+
+
+if __name__ == "__main__":
+    tts = GoogleTextToSpeechService()
+    tts.generate_audio("Merhaba dünya", "output")            

@@ -1,11 +1,13 @@
 import base64
 import google.generativeai as genai
-from backend.google_gemini import AIModels
 import asyncio
+import os
+
+
 
 
 class Gemini:
-    api_key = "AIzaSyAu8tM0uLKv1Ed8P3mnnLM1yKrf25WGLtw"
+    api_key = os.getenv("GEMINI_API_KEY")
 
     if api_key is None:
         print("Error: GEMINI_API_KEY environment variable not set. Please set it.")
@@ -44,45 +46,37 @@ class Gemini:
         "top_k": 64,
         "max_output_tokens": 8192,
         "response_mime_type": "text/plain",
-        "stream": True, 
     }
 
-   
     model = genai.GenerativeModel(
         model_name="gemini-1.5-flash",
         generation_config=generation_config,
     )
 
-    # Start chat session
     chat_session = model.start_chat(history=[], )
 
     async def call_gemini(self, prompt: str):
         try:
-            response = self.chat_session.send_message_async(prompt)
-            yield response.text
-
-        except Exception as e:  # Catch generic exceptions for broader error handling
-            print(f"Error during interaction: {e}")
-
-
-
-
-
-    async def call_gemini_with_audio(self, audio_file_path: str):
-
-        with open(audio_file_path, "rb") as audio_file:
-            base64_audio = base64.b64encode(audio_file.read()).decode('utf-8')
-
-        try:
-            response = self.chat_session.send_message(base64_audio)
-            yield response.text
-
-        except Exception as e:  # Catch generic exceptions for broader error handling
-            print(f"Error during interaction: {e}")
+            response = self.chat_session.send_message(prompt)
+            print(response.text)
+            return response.text
+        
+        except ValueError as e:
+            print(f"Invalid input: {e}")
+        
+        except Exception as e:
+            print(f"Unexpected error: {e}")
 
 
     async def voice_message(self, voice_path):
         upload_file = genai.upload_file(path=voice_path)
 
         response =  self.model.generate_content(["describe this audio file", upload_file])
-        yield response.text
+        print(response.text)
+        return response.text
+
+
+if __name__ == "__main__":
+    api = Gemini()
+    # asyncio.run(api.voice_message("output.mp3"))
+    # asyncio.run(api.call_gemini("naber nasil gidiyor"))        
