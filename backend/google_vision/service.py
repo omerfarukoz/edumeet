@@ -13,10 +13,9 @@ class GoogleVisionService:
     async def analyze_video(self, video_path):
 
         features = [
-            videointelligence.Feature.SHOT_CHANGE_DETECTION,
             videointelligence.Feature.LABEL_DETECTION,
             videointelligence.Feature.TEXT_DETECTION,
-            videointelligence.Feature.SPEECH_TRANSCRIPTION
+            videointelligence.Feature.SPEECH_TRANSCRIPTION,
         ]
 
         config = videointelligence.SpeechTranscriptionConfig(
@@ -37,6 +36,7 @@ class GoogleVisionService:
         try:
             result = operation.result(timeout=120)
             annotation_results = result.annotation_results[0]
+            transcript_result = result.annotation_results[1]
 
             with open("my_file.txt", "w") as file:
                 file.write(str(result))
@@ -53,10 +53,29 @@ class GoogleVisionService:
 
             
             speech_transcriptions = []
-            for speech_transcription in annotation_results.speech_transcriptions:
+            for speech_transcription in transcript_result.speech_transcriptions:
                 if speech_transcription.alternatives:
                     speech_transcriptions.append(speech_transcription.alternatives[0].transcript)
 
+            data = (label_descriptions, text_annotations, speech_transcriptions)
+
+
+            print(speech_transcriptions)
+
+            with open("my_file2.txt", "w") as file:
+
+                file.write(str(label_descriptions))
+                file.write("\n")
+                file.write(str(text_annotations))
+                file.write("\n")
+                file.write(str(speech_transcriptions))
+
+            return {
+                "label_descriptions": label_descriptions,
+                "text_annotations": text_annotations,
+                "speech_transcriptions": speech_transcriptions
+            }
+        
         except TimeoutError:
             raise Exception("Timeout Error")
         
@@ -94,12 +113,10 @@ class GoogleVisionService:
                 "headwear": face.headwear_likelihood,
             }
             face_emotions.append(emotions)
-
+        print(face_emotions)
         return face_emotions
 
         
-
-
 
     async def detect_text(self, image_path):
         """Detects text in an image at the given path.
@@ -122,14 +139,15 @@ class GoogleVisionService:
         response = self.image_client.text_detection(image=image)
         texts = response.text_annotations
 
+        all_texts = []
+        for text in texts:
+
+            all_texts.append(text.description)
+
         if response.error.message:
             raise Exception(f'Error during text detection: {response.error.message}')
-
-        # Process or return the detected text annotations
-        for text in texts:
-            print(f'\n"{text.description}"')
-
-        return texts
+        print(all_texts)
+        return all_texts
     
     async def detect_document_all_text(self, path):
         """Detects document features in an image and returns all text as a single string."""
@@ -139,7 +157,7 @@ class GoogleVisionService:
         image = vision.Image(content=content)
 
         response = self.image_client.document_text_detection(image=image)       
-        print(response)
+        return response.full_text_annotation.text
 
 
 
@@ -166,12 +184,13 @@ class GoogleVisionService:
 
         if response.error.message:
             raise Exception(f'Error during label detection: {response.error.message}')
-
+        all_labels = []
         # Process or return the detected labels
         for label in labels:
-            print(f'\n"{label.description}"')
+            all_labels.append(label.description)
 
-        return labels   
+        print(all_labels)
+        return all_labels   
     
 if __name__ == "__main__":
     api = GoogleVisionService()
@@ -179,8 +198,6 @@ if __name__ == "__main__":
   # asyncio.run(api.detect_document_all_text("/Users/celalcanaslan/Desktop/Screenshot 2024-10-27 at 15.19.59.png"))
   # asyncio.run(api.detect_labels("/Users/celalcanaslan/Desktop/Screenshot 2024-10-27 at 15.19.59.png"))
   # asyncio.run(api.detect_text("/Users/celalcanaslan/Desktop/Screenshot 2024-10-27 at 15.19.59.png"))
-    asyncio.run(api.analyze_video("/Users/celalcanaslan/Downloads/last-video.mp4")) # b
-  # emotions = asyncio.run(api.detect_face_emotions(image_path))
-
-
-
+  # asyncio.run(api.analyze_video("/Users/celalcanaslan/Downloads/last-video.mp4"))
+  # asyncio.run(api.detect_face_emotions("/Users/celalcanaslan/Downloads/Angry-Person-Mad-Transparent-PNG.png"))
+ 

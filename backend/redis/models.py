@@ -16,13 +16,8 @@ class ImageLabelResponse(BaseModel):
     labels: list[LabelAnnotation]
 
 
-
 class EmotionLikelihood(BaseModel):
-    joy: str
-    anger: str
-    surprise: str
-    sorrow: str
-    uncertainty: str    
+    emotions: dict[str, str]
 
     
 class VideoAnalysisResult(BaseModel):

@@ -29,4 +29,14 @@ class GoogleTextToSpeechService:
 
 if __name__ == "__main__":
     tts = GoogleTextToSpeechService()
-    tts.generate_audio("Merhaba dünya", "output")            
+
+    text = """
+Flutter projemize harici bir sdk entegre etmek için öncelikle entegre etmek istediğimiz
+dosyayı projemizin dosyalarına yerleştirmemiz gerekiyor. Projemizin root dizininde
+bizi platform bazlı dosyalar karşılıyor. Burada Android tarafında bir entegrasyon
+yapmak için root dizini içerisinden android’e, ios veya farklı başka platformlarda
+entegrasyon yapmak için ilgili platformun dosyalarında düzenleme yapmamız
+gerekiyor
+Android platformuna özel bir entegrasyon için şu adımları takip ediyoruz"""
+
+    tts.generate_audio(text, "output")            

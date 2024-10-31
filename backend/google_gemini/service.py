@@ -2,11 +2,12 @@ import base64
 import google.generativeai as genai
 import asyncio
 import os
+from model import Prompts
 
 
 
 
-class Gemini:
+class GoogleGeminiService:
     api_key = os.getenv("GEMINI_API_KEY")
 
     if api_key is None:
@@ -41,9 +42,9 @@ class Gemini:
 # penalty_alpha = 1.0  # Higher values make the penalties more influential
 
     generation_config = {
-        "temperature": 1,
-        "top_p": 0.95,
-        "top_k": 64,
+        "temperature": 0.3,
+        "top_p": 0.3,
+        "top_k": 10,
         "max_output_tokens": 8192,
         "response_mime_type": "text/plain",
     }
@@ -55,9 +56,9 @@ class Gemini:
 
     chat_session = model.start_chat(history=[], )
 
-    async def call_gemini(self, prompt: str):
+    async def call_gemini(self, prompt: str, data = None):
         try:
-            response = self.chat_session.send_message(prompt)
+            response = self.chat_session.send_message(prompt + "\n" + data)
             print(response.text)
             return response.text
         
@@ -68,15 +69,10 @@ class Gemini:
             print(f"Unexpected error: {e}")
 
 
-    async def voice_message(self, voice_path):
+    async def voice_message(self, prompt: str, voice_path: str):
         upload_file = genai.upload_file(path=voice_path)
 
-        response =  self.model.generate_content(["describe this audio file", upload_file])
+        response =  self.model.generate_content([prompt, upload_file])
         print(response.text)
         return response.text
 
-
-if __name__ == "__main__":
-    api = Gemini()
-    # asyncio.run(api.voice_message("output.mp3"))
-    # asyncio.run(api.call_gemini("naber nasil gidiyor"))        
