@@ -3,7 +3,12 @@ from google.cloud import language
 
 class GoogleNaturalLanguageService:
 
-    client = language.LanguageServiceClient()
+    # This class is a wrapper for the Google Natural Language API.
+    # It provides methods for sentiment analysis, entity extraction, and text classification.
+    # It returns a dictionary containing the sentiment score, entities, and categories of the input text.
+
+    def __init__(self):
+        self.client = language.LanguageServiceClient()
     
     def analyze_document(self,text):
     
@@ -23,9 +28,3 @@ class GoogleNaturalLanguageService:
             "entities": entities,
             "categories": categories
         }
-
-
-if __name__ == "__main__":
-    text = "This is a sample text for sentiment analysis. and more and more words for testing the entity analysis."
-    result = GoogleNaturalLanguageService().analyze_document(text)
-    print(result)

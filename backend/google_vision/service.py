@@ -1,9 +1,15 @@
 from google.cloud import videointelligence
 from google.cloud import vision
 import io
-import asyncio
+
 
 class GoogleVisionService:
+
+
+    # This class is used to interact with Google Vision API.
+    # It provides methods to detect text, labels, faces, emotions, and video analysis.
+    # It uses the google-cloud-vision and google-cloud-videointelligence libraries.
+
 
     def __init__(self):
         self.video_client = videointelligence.VideoIntelligenceServiceClient()
@@ -38,9 +44,6 @@ class GoogleVisionService:
             annotation_results = result.annotation_results[0]
             transcript_result = result.annotation_results[1]
 
-            with open("my_file.txt", "w") as file:
-                file.write(str(result))
-
             label_descriptions = []
             for annotation in annotation_results.shot_label_annotations:
                 if annotation.entity.description:
@@ -59,17 +62,6 @@ class GoogleVisionService:
 
             data = (label_descriptions, text_annotations, speech_transcriptions)
 
-
-            print(speech_transcriptions)
-
-            with open("my_file2.txt", "w") as file:
-
-                file.write(str(label_descriptions))
-                file.write("\n")
-                file.write(str(text_annotations))
-                file.write("\n")
-                file.write(str(speech_transcriptions))
-
             return {
                 "label_descriptions": label_descriptions,
                 "text_annotations": text_annotations,
@@ -80,7 +72,6 @@ class GoogleVisionService:
             raise Exception("Timeout Error")
         
 
-
     async def detect_face_emotions(self,image_path):
         """Detects faces in an image and extracts emotions.
 
@@ -90,8 +81,6 @@ class GoogleVisionService:
         Returns:
             A list of detected faces with their emotions in a dictionary format.
         """
-
-        
 
         with io.open(image_path, 'rb') as image_file:
             content = image_file.read()
@@ -113,7 +102,7 @@ class GoogleVisionService:
                 "headwear": face.headwear_likelihood,
             }
             face_emotions.append(emotions)
-        print(face_emotions)
+
         return face_emotions
 
         
@@ -146,7 +135,7 @@ class GoogleVisionService:
 
         if response.error.message:
             raise Exception(f'Error during text detection: {response.error.message}')
-        print(all_texts)
+        
         return all_texts
     
     async def detect_document_all_text(self, path):
@@ -184,20 +173,12 @@ class GoogleVisionService:
 
         if response.error.message:
             raise Exception(f'Error during label detection: {response.error.message}')
+        
         all_labels = []
-        # Process or return the detected labels
+
         for label in labels:
             all_labels.append(label.description)
 
-        print(all_labels)
         return all_labels   
-    
-if __name__ == "__main__":
-    api = GoogleVisionService()
 
-  # asyncio.run(api.detect_document_all_text("/Users/celalcanaslan/Desktop/Screenshot 2024-10-27 at 15.19.59.png"))
-  # asyncio.run(api.detect_labels("/Users/celalcanaslan/Desktop/Screenshot 2024-10-27 at 15.19.59.png"))
-  # asyncio.run(api.detect_text("/Users/celalcanaslan/Desktop/Screenshot 2024-10-27 at 15.19.59.png"))
-  # asyncio.run(api.analyze_video("/Users/celalcanaslan/Downloads/last-video.mp4"))
-  # asyncio.run(api.detect_face_emotions("/Users/celalcanaslan/Downloads/Angry-Person-Mad-Transparent-PNG.png"))
  

@@ -78,10 +78,9 @@ Data arasında yanlış bilgi varsa ->
 """
 
     final_text: str = """"
-    dataları anlamlı ve kısa şekilde birleştir ve şu formatta soru ya da wrong information belirt -> 
-{
-“final_response”: < response >
-}
+    datayı incele, eğer sana verilen data içerisinde yanlış bilgiyi düzelt, ardından konuyu devam ettirecek bir soru sor. eğer  sana verilen datada yanlış bir bilgi yok ise soru ile devam et.  Soru sorma aşamasında "yardıma ihtiyacın var mı" gibi ifadeler yerine kullanıcıya konu açma odaklı bir soru sor. Ben senden soru cevaplamanı istemiyorum. Kullanıcıya beyin fırtınası yapması için konu ile alakalı bir soru sor Detaya in fakat özet bir şekilde yaz. Bunu {
+    "final_response":<response> } kısmına yazdır
+
     """
 
     clear_label_text: str = """
@@ -91,11 +90,10 @@ bu label data dan teknik olmayan şeyleri çıkar ve şu formatta yanıt ver ->
 }
 """
 
-    analyze_emotion_promt: str = Field(emotion_text, description="Emotion prompt for Gemini")
-    analyze_voice_promt: str = Field(voice_text, description="Voice prompt for Gemini")
-    analyze_document_promt: str = Field("analyze document", description="Document prompt for Gemini")
-    analyze_text_promt: str = Field("analyze text", description="Text prompt for Gemini")
+    analyze_emotion_prompt: str = Field(emotion_text, description="Emotion prompt for Gemini")
+    analyze_voice_prompt: str = Field(voice_text, description="Voice prompt for Gemini")
+    analyze_document_prompt: str = Field("analyze document", description="Document prompt for Gemini")
     analyze_text_and_lable_prompt: str = Field(text_and_lable_text, description="Text and label prompt for Gemini")
-    analyze_final_promt: str = Field(final_text, description="Final prompt for Gemini")
-    analyze_video_promt: str = Field(video_text, description="Video prompt for Gemini")
-    clear_label_promt: str = Field(clear_label_text, description="Clear label prompt for Gemini")
+    analyze_final_prompt: str = Field(final_text, description="Final prompt for Gemini")
+    analyze_video_promtp: str = Field(video_text, description="Video prompt for Gemini")
+    clear_label_prompt: str = Field(clear_label_text, description="Clear label prompt for Gemini")

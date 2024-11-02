@@ -1,11 +1,17 @@
 from google.cloud import storage
-import asyncio
+
 
 class StorageService:
-    
-    async def upload_file_to_gcs(self, bucket_name, source_file_name, destination_blob_name):
+
+
+        # This function uploads a file to a bucket in GCS for meeting recordings and materials
+        # It returns the blob uri of the uploaded file
+
+    async def upload_file_to_gcs(self, bucket_name, source_file_name, destination_blob_name, project_id:str):
+
         # Use google.cloud.storage directly
-        storage_client = storage.Client(project="skilful-rain-418418")
+
+        storage_client = storage.Client(project=project_id)
         bucket = storage_client.bucket(bucket_name)
         blob = bucket.blob(destination_blob_name)
 
@@ -17,10 +23,3 @@ class StorageService:
 
         return blob_uri
 
-bucket_name = "test_bucket"  # GCS bucket name
-source_file_name = "/Users/celalcanaslan/Desktop/Image.jpeg"  # Local file path
-destination_blob_name = "uploaded/Image.jpeg"  # Target filename in GCS
-
-if __name__ == "__main__":
-    storage_service = StorageService()  # Renamed instance variable
-    asyncio.run(storage_service.upload_file_to_gcs(bucket_name, source_file_name, destination_blob_name))

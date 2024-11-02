@@ -1,0 +1,9 @@
+myenv/
+venv/
+.env/
+.myenv/
+
+
+.vscode/
+.idea/
+.DS_Store

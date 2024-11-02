@@ -1,10 +1,5 @@
-import base64
 import google.generativeai as genai
-import asyncio
 import os
-from model import Prompts
-
-
 
 
 class GoogleGeminiService:
@@ -42,9 +37,9 @@ class GoogleGeminiService:
 # penalty_alpha = 1.0  # Higher values make the penalties more influential
 
     generation_config = {
-        "temperature": 0.3,
-        "top_p": 0.3,
-        "top_k": 10,
+        "temperature": 0.25,
+        "top_p": 0.4,
+        "top_k": 150,
         "max_output_tokens": 8192,
         "response_mime_type": "text/plain",
     }
@@ -56,9 +51,9 @@ class GoogleGeminiService:
 
     chat_session = model.start_chat(history=[], )
 
-    async def call_gemini(self, prompt: str, data = None):
+    async def call_gemini(self, prompt: str, data: any):
         try:
-            response = self.chat_session.send_message(prompt + "\n" + data)
+            response = self.chat_session.send_message(prompt + "\n" + str(data))
             print(response.text)
             return response.text
         

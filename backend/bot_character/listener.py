@@ -3,6 +3,10 @@ import pyttsx3
 
 class Listener:
 
+
+    # This class is used to listen for voice commands and convert them to text.
+    # It uses Google speech to text via the SpeechRecognition library and pyttsx3 library.
+
     engine = pyttsx3.init()
     recognizer = sr.Recognizer()
 
@@ -32,20 +36,3 @@ class Listener:
                 print("Could not understand the audio")
             except sr.RequestError as e:
                 print(f"Error with the recognition service: {e}")
-
-    def get_hundred_word(self):
-        word_count = 0
-        while True:
-            command = self.listen_for_command()
-            if command:
-                word_count += command.count(" ") + 1 
-
-                if word_count >= 100:
-                    print(f"You said: {command}")
-                    word_count = 0  
-
-if __name__ == "__main__":
-    listener = Listener()
-   
-    while True:
-        listener.get_hundred_word()

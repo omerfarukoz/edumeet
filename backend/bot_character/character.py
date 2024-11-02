@@ -50,7 +50,3 @@ class CharacterPlayer:
     def quit(self):
         self.cap.release()
         cv2.destroyAllWindows()
-
-video_path = 'backend/bot_character/assets/istockphoto-1180991798-640_adpp_is.mp4'
-player = CharacterPlayer(video_path)
-player.play()

@@ -2,6 +2,8 @@ import pygame
 
 class Speaker:
 
+    # This class is used to play google text-to-speech audio files.
+    
     def __init__(self):
        
         pygame.mixer.init()
@@ -14,8 +16,3 @@ class Speaker:
 
         while pygame.mixer.music.get_busy():
             pygame.time.Clock().tick(10)
-
-
-if __name__ == "__main__":
-    speaker = Speaker()
-    speaker.speak("output.mp3")
