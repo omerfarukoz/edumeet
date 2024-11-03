@@ -24,7 +24,7 @@ EduMeet, prensipleri çerçevesinde aktarılan bilginin doğruluğuna, sunum yap
 4.⁠ ⁠*Sonuçların Birleştirilmesi*: Gemini 1.5 Flash’ın ürettiği sonuçlar bir araya getirilip Gemini 1.5 Pro modelinde bir bütün şeklinde inceleniyor. Tespit edilen yanlışlıklar ve üretilen sorular algılanan duygu ve konuşma biçimi ile birleşip tek bir sonuca dönüştürülüyor. Ardından Google Text to Speech kullanılarak karakterimiz konuşmaya başlıyor.
 
 
-
+Toplantılar, açık kaynak bir araç kullanılarak kendi sunucumuzda gerçekleştiriliyor; bu sayede harici bir toplantı servisine ihtiyaç duyulmadan tüm kontroller bizde ve etik kurallar çerçevesinde gerçekleşiyor
 
 
 
@@ -54,7 +54,7 @@ EduMeet pays attention to the accuracy of the information conveyed within the fr
 
 4. *Combining the Results*: The results produced by Gemini 1.5 Flash are brought together and analyzed as a whole in the Gemini 1.5 Pro model. The inaccuracies detected and the questions generated are combined with the perceived emotion and speech style and converted into a single result. Then, using Google Text to Speech, our character starts to speak.
 
-
+Meetings are held on our own server using an open source tool, so we have all the controls and ethics in place without the need for an external meeting service
 
 
 
