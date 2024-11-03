@@ -1,0 +1,13 @@
+{
+    "url": "https://meet.edumeet.tech/selamknk",
+    "numberofbots": 5,
+    "haspassword": false,
+    "password": "",
+    "message": "",
+    "writemessage": true,
+    "raisehands": true,
+    "userandomnames": false,
+    "customname": "EduMeet",
+    "playvideo": false,
+    "playaudio": true
+}

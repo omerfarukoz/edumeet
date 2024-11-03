@@ -1,0 +1,16 @@
+google-cloud-videointelligence
+google-cloud-storage
+google-cloud-vision
+google-cloud-speech
+google-generativeai
+google-cloud-texttospeech
+google-cloud-language
+moviepy
+python-multipart
+opencv-python
+pydantic
+SpeechRecognition
+pyttsx3
+redis
+pygame
+selenium
